@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.signcustomviewexample.R
+import kotlinx.android.synthetic.main.main_fragment.*
 
 class MainFragment : Fragment(R.layout.main_fragment) {
 
@@ -15,7 +16,9 @@ class MainFragment : Fragment(R.layout.main_fragment) {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-
+        clearButton.setOnClickListener {
+            drawerView.resetDrawer()
+        }
     }
 
 }
