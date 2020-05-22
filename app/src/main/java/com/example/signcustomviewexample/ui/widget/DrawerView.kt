@@ -16,16 +16,23 @@ class DrawerView @JvmOverloads constructor(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         color = Color.GREEN
-        textAlign = Paint.Align.LEFT
-        textSize = 50F
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
-        strokeWidth = 5F
+        strokeWidth = 8F
+    }
+
+    private val paintForExport = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        color = Color.RED
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+        strokeWidth = 8F
     }
 
     private val path = Path()
     private lateinit var bitmap: Bitmap
     private var isCleared = false
+    private var drawingForExport = false
 
     private val touchTolerance = 4f
 
@@ -38,7 +45,12 @@ class DrawerView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        canvas?.drawPath(path, paint)
+        if (!drawingForExport)
+            canvas?.drawPath(path, paint)
+        else {
+            canvas?.drawPath(path, paintForExport)
+            drawingForExport = false
+        }
     }
 
     private fun handleMove(x: Float, y: Float) {
@@ -85,5 +97,14 @@ class DrawerView @JvmOverloads constructor(
         path.reset()
         isCleared = true
         invalidate()
+    }
+
+    fun getBitmap(config: Bitmap.Config): Bitmap {
+        val bitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, config)
+
+        drawingForExport = true
+        draw(Canvas(bitmap))
+
+        return bitmap
     }
 }
