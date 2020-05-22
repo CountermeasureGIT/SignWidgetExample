@@ -5,6 +5,9 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import kotlin.math.abs
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class DrawerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -13,17 +16,21 @@ class DrawerView @JvmOverloads constructor(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         color = Color.GREEN
-        textAlign = Paint.Align.CENTER
+        textAlign = Paint.Align.LEFT
         textSize = 50F
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
         strokeWidth = 5F
     }
+
     private val path = Path()
     private lateinit var bitmap: Bitmap
+    private var isCleared = false
 
-    private var resetClicked = false
-    private var prevPointerPosition: PointF? = null
+    private val touchTolerance = 4f
+
+    private var mX = 0f
+    private var mY = 0f
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ALPHA_8)
@@ -34,32 +41,39 @@ class DrawerView @JvmOverloads constructor(
         canvas?.drawPath(path, paint)
     }
 
+    private fun handleMove(x: Float, y: Float) {
+        val distance = sqrt(abs(x - mX).pow(2) + abs(y - mY).pow(2))
+        if (distance >= touchTolerance) {
+            path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2)
+        } else {
+            path.lineTo(x, y)
+        }
+        mX = x
+        mY = y
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 path.moveTo(event.x, event.y)
-                if (prevPointerPosition != null) {
-                    prevPointerPosition?.x = event.x
-                    prevPointerPosition?.y = event.y
-                } else
-                    prevPointerPosition = PointF(event.x, event.y)
-
+                mX = event.x
+                mY = event.y
                 invalidate()
             }
             MotionEvent.ACTION_UP -> {
                 path.lineTo(event.x, event.y)
-                prevPointerPosition = null
-
                 invalidate()
             }
             MotionEvent.ACTION_MOVE -> {
-                if (resetClicked) {
+                if (isCleared) {
                     path.moveTo(event.x, event.y)
-                    resetClicked = false
-                } else
-                    path.lineTo(event.x, event.y)
-                prevPointerPosition?.x = event.x
-                prevPointerPosition?.y = event.y
+                    isCleared = false
+                } else {
+                    handleMove(event.x, event.y)
+                }
+
+                mX = event.x
+                mY = event.y
 
                 invalidate()
             }
@@ -67,9 +81,9 @@ class DrawerView @JvmOverloads constructor(
         return true
     }
 
-    fun resetDrawer() {
+    fun clearDrawer() {
         path.reset()
-        resetClicked = true
+        isCleared = true
         invalidate()
     }
 }

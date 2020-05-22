@@ -17,7 +17,7 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         clearButton.setOnClickListener {
-            drawerView.resetDrawer()
+            drawerView.clearDrawer()
         }
     }
 
