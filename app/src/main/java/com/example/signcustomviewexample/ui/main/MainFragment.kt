@@ -2,6 +2,7 @@ package com.example.signcustomviewexample.ui.main
 
 import android.graphics.Bitmap
 import android.os.Bundle
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -23,7 +24,11 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         }
         saveButton.setOnClickListener {
             signImageView.setImageBitmap(
-                drawerView.getBitmap(Bitmap.Config.ALPHA_8).scale(300, 300)
+                drawerView.getBitmap(
+                    Bitmap.Config.ALPHA_8,
+                    8,
+                    ResourcesCompat.getColor(resources, R.color.colorPrimary, null)
+                ).scale(300, 300)
             )
         }
     }
