@@ -5,7 +5,6 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -54,7 +53,7 @@ class DrawerView @JvmOverloads constructor(
     }
 
     private fun handleMove(x: Float, y: Float) {
-        val distance = sqrt(abs(x - mX).pow(2) + abs(y - mY).pow(2))
+        val distance = sqrt((x - mX).pow(2) + (y - mY).pow(2))
         if (distance >= touchTolerance) {
             path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2)
         } else {
